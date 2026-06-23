@@ -1,8 +1,9 @@
 'use client'
 
+import { PROVIDER_COLORS } from "@/lib/constants"
+import { ModelBreakdown } from "@/lib/types"
+
 // components/charts/TokenBreakdown.tsx
-import { PROVIDER_COLORS } from '../../lib/constants'
-import type { ModelBreakdown } from '../../lib/types'
 
 interface TokenBreakdownProps {
   data: ModelBreakdown[]
