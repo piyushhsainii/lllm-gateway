@@ -1,4 +1,4 @@
-# @piyushhsainii/llmgateway
+# ai-llmgateway
 
 TypeScript/JavaScript SDK for [LLM Gateway](https://lllm-gateway.vercel.app/) — a fast Rust-powered LLM reverse proxy that gives you unified access to OpenAI, Anthropic, and Gemini with **budget control, usage tracking, and cost transparency** — built for AI agents and organizations.
 
