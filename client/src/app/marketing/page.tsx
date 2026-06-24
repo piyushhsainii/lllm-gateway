@@ -9,13 +9,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-[rgba(250,250,249,0.9)] backdrop-blur-md border-b border-[#e4e2dd] flex items-center justify-between px-8">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 bg-[#c94f1a] rounded flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1L13 7L7 13L1 7L7 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-              <circle cx="7" cy="7" r="2" fill="white"/>
-            </svg>
-          </div>
-          <span className="font-mono text-sm font-semibold text-[#1c1b18]">llm-gateway</span>
+          <img src="/llmgateway-logo-nobg.png" className='h-20 ' alt="" />
         </div>
         <div className="flex items-center gap-6">
           <a href="#features" className="text-xs text-[#6b6860] hover:text-[#1c1b18] transition-colors font-light">Features</a>
@@ -51,7 +45,7 @@ export default function LandingPage() {
           </Link>
           <a href="https://github.com/llmgateway" className="border border-[#e4e2dd] text-[#6b6860] rounded-lg px-5 py-3 font-mono text-xs hover:border-[#ccc9c2] hover:text-[#1c1b18] transition-all flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-              <path d="M7 0C3.13 0 0 3.13 0 7c0 3.09 2.01 5.72 4.79 6.65.35.06.48-.15.48-.34v-1.2c-1.95.42-2.36-.94-2.36-.94-.32-.81-.78-1.03-.78-1.03-.64-.44.05-.43.05-.43.7.05 1.07.72 1.07.72.62 1.07 1.63.76 2.03.58.06-.45.24-.76.44-.93-1.56-.18-3.2-.78-3.2-3.47 0-.77.27-1.4.72-1.89-.07-.18-.31-.9.07-1.87 0 0 .59-.19 1.93.72A6.7 6.7 0 017 3.72c.6 0 1.2.08 1.76.23 1.34-.91 1.93-.72 1.93-.72.38.97.14 1.69.07 1.87.45.49.72 1.12.72 1.89 0 2.7-1.64 3.29-3.2 3.47.25.22.47.65.47 1.31v1.94c0 .19.13.4.48.34A7.002 7.002 0 0014 7c0-3.87-3.13-7-7-7z"/>
+              <path d="M7 0C3.13 0 0 3.13 0 7c0 3.09 2.01 5.72 4.79 6.65.35.06.48-.15.48-.34v-1.2c-1.95.42-2.36-.94-2.36-.94-.32-.81-.78-1.03-.78-1.03-.64-.44.05-.43.05-.43.7.05 1.07.72 1.07.72.62 1.07 1.63.76 2.03.58.06-.45.24-.76.44-.93-1.56-.18-3.2-.78-3.2-3.47 0-.77.27-1.4.72-1.89-.07-.18-.31-.9.07-1.87 0 0 .59-.19 1.93.72A6.7 6.7 0 017 3.72c.6 0 1.2.08 1.76.23 1.34-.91 1.93-.72 1.93-.72.38.97.14 1.69.07 1.87.45.49.72 1.12.72 1.89 0 2.7-1.64 3.29-3.2 3.47.25.22.47.65.47 1.31v1.94c0 .19.13.4.48.34A7.002 7.002 0 0014 7c0-3.87-3.13-7-7-7z" />
             </svg>
             View on GitHub
           </a>
@@ -192,11 +186,10 @@ export default function LandingPage() {
             ].map(({ name, price, period, features, cta, featured }) => (
               <div
                 key={name}
-                className={`bg-white rounded-xl p-6 shadow-sm ${
-                  featured
-                    ? 'border border-[#c94f1a] ring-1 ring-[#c94f1a]'
-                    : 'border border-[#e4e2dd]'
-                }`}
+                className={`bg-white rounded-xl p-6 shadow-sm ${featured
+                  ? 'border border-[#c94f1a] ring-1 ring-[#c94f1a]'
+                  : 'border border-[#e4e2dd]'
+                  }`}
               >
                 {featured && (
                   <div className="font-mono text-[10px] text-[#c94f1a] uppercase tracking-[0.1em] mb-3">
@@ -219,11 +212,10 @@ export default function LandingPage() {
                 </ul>
                 <Link
                   href="/auth/signup"
-                  className={`block text-center rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity ${
-                    featured
-                      ? 'bg-[#c94f1a] text-white hover:opacity-90'
-                      : 'border border-[#e4e2dd] text-[#6b6860] hover:border-[#ccc9c2] hover:text-[#1c1b18]'
-                  }`}
+                  className={`block text-center rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity ${featured
+                    ? 'bg-[#c94f1a] text-white hover:opacity-90'
+                    : 'border border-[#e4e2dd] text-[#6b6860] hover:border-[#ccc9c2] hover:text-[#1c1b18]'
+                    }`}
                 >
                   {cta}
                 </Link>
@@ -239,8 +231,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5">
             <div className="w-5 h-5 bg-[#c94f1a] rounded flex items-center justify-center">
               <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1L13 7L7 13L1 7L7 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-                <circle cx="7" cy="7" r="2" fill="white"/>
+                <path d="M7 1L13 7L7 13L1 7L7 1Z" stroke="white" strokeWidth="1.5" fill="none" />
+                <circle cx="7" cy="7" r="2" fill="white" />
               </svg>
             </div>
             <span className="font-mono text-xs text-[#9c9890]">llm-gateway</span>

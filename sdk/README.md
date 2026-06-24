@@ -1,121 +1,148 @@
-# llmgateway
+# @piyushhsainii/llmgateway
 
-TypeScript/JavaScript SDK for [llm-gateway](https://github.com/your-org/llm-gateway) — a fast Rust LLM reverse proxy supporting OpenAI, Anthropic, and Gemini.
+TypeScript/JavaScript SDK for [LLM Gateway](https://lllm-gateway.vercel.app/) — a fast Rust-powered LLM reverse proxy that gives you unified access to OpenAI, Anthropic, and Gemini with **budget control, usage tracking, and cost transparency** — built for AI agents and organizations.
 
-Zero dependencies. Native fetch. Node 18+.
+Zero dependencies. Native fetch. Works in Node 18+, Edge, and browsers.
+
+---
+
+## What is LLM Gateway?
+
+LLM Gateway sits between your application and LLM providers. Instead of calling OpenAI or Anthropic directly, you call the gateway — and it handles routing, cost tracking, budget enforcement, and observability across all your models in one place.
+
+It's built for:
+
+- **AI agents** that need to stay within a budget and not bleed costs unexpectedly
+- **Organizations** that want centralized visibility into how models are being used across teams
+- **Developers** who want a single unified API across OpenAI, Anthropic, and Gemini
+
+---
+
+## Hosted vs. Self-Hosted
+
+### Hosted (production)
+
+Sign up at **[lllm-gateway.vercel.app](https://lllm-gateway.vercel.app/)** to get your API key. No infrastructure setup needed.
+
+```bash
+LLMGATEWAY_API_KEY=gw_live_abc123           # from your dashboard at lllm-gateway.vercel.app
+LLMGATEWAY_PROVIDER_KEY=sk-openai-xyz       # your OpenAI / Anthropic / Gemini key
+LLMGATEWAY_BASE_URL=https://your-gateway.shuttle.app/v1
+```
+
+### Self-hosted (free, local or your own server)
+
+Run the gateway yourself for free using the open source Rust server.
+
+```bash
+git clone https://github.com/piyushhsainii/lllm-gateway
+cd lllm-gateway
+cargo shuttle deploy
+```
+
+Full setup instructions: **[github.com/piyushhsainii/lllm-gateway](https://github.com/piyushhsainii/lllm-gateway)**
+
+Then point the SDK at your local URL:
+
+```bash
+LLMGATEWAY_BASE_URL=http://localhost:8000/v1
+```
 
 ---
 
 ## Install
 
 ```bash
-npm install llmgateway
+npm install @piyushhsainii/llmgateway
 # or
-pnpm add llmgateway
+pnpm add @piyushhsainii/llmgateway
 # or
-yarn add llmgateway
+yarn add @piyushhsainii/llmgateway
 ```
 
 ---
 
-## Environment variables
-
-```bash
-LLMGATEWAY_API_KEY=gw_live_abc123           # your gateway key
-LLMGATEWAY_PROVIDER_KEY=sk-openai-xyz       # your provider key (OpenAI / Anthropic / Gemini)
-LLMGATEWAY_BASE_URL=https://your-gateway.shuttle.app/v1  # optional
-```
-
----
-
-## Quick start
-
-Pass `provider` first — the response shape matches that provider's SDK exactly.
+## Quick Start
 
 ```typescript
-import { Gateway } from "llmgateway";
+import { Gateway } from "@piyushhsainii/llmgateway";
 
 const gw = new Gateway();
 // reads LLMGATEWAY_API_KEY + LLMGATEWAY_PROVIDER_KEY from env
+
+const res = await gw.chat("openai", "gpt-4o", [
+  { role: "user", content: "Summarize today's tasks" },
+]);
+
+console.log(res.choices[0].message.content);
 ```
+
+Pass `provider` first — the response shape matches that provider's native SDK exactly, so there's no new API to learn.
 
 ---
 
 ## OpenAI
-
-Response fields match the [OpenAI Node SDK](https://github.com/openai/openai-node) exactly.
 
 ```typescript
 const res = await gw.chat("openai", "gpt-4o", [
   { role: "user", content: "Hello" },
 ]);
 
-// Same fields as OpenAI SDK
-res.id;
-res.object;                           // "chat.completion"
-res.choices[0].message.content;       // "Hi there!"
-res.choices[0].finish_reason;         // "stop"
+// Identical to the OpenAI Node SDK response shape
+res.choices[0].message.content; // "Hi there!"
+res.choices[0].finish_reason; // "stop"
 res.usage.prompt_tokens;
 res.usage.completion_tokens;
 res.usage.total_tokens;
 
-// Gateway metadata (extra, not in OpenAI SDK)
-res._gateway.provider;                // "openai"
-res._gateway.cached;                  // false
+// Gateway metadata (extra fields not in the OpenAI SDK)
+res._gateway.provider; // "openai"
+res._gateway.cached; // true/false
 res._gateway.requestId;
 res._gateway.gatewayLatencyMs;
 ```
 
-### OpenAI streaming
+### Streaming
 
 ```typescript
 for await (const chunk of gw.stream("openai", "gpt-4o", messages)) {
-  // Same shape as OpenAI streaming SDK
   process.stdout.write(chunk.choices[0].delta.content ?? "");
 
   if (chunk.choices[0].finish_reason === "stop") {
-    console.log("\nTokens:", chunk.usage?.total_tokens);
+    console.log("\nTotal tokens used:", chunk.usage?.total_tokens);
   }
 }
 ```
 
-### OpenAI models
+### Available models
 
 ```typescript
 gw.models("openai");
-// ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo", "o1", "o1-mini", "o3", "o3-mini"]
+// ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo",
+//  "o1", "o1-mini", "o3", "o3-mini"]
 ```
 
 ---
 
 ## Anthropic
 
-Response fields match the [Anthropic Node SDK](https://github.com/anthropics/anthropic-sdk-typescript) exactly.
-
 ```typescript
 const res = await gw.chat("anthropic", "claude-opus-4-6", [
   { role: "user", content: "Hello" },
 ]);
 
-// Same fields as Anthropic SDK
-res.id;
-res.type;                             // "message"
-res.role;                             // "assistant"
-res.content[0].type;                  // "text"
-res.content[0].text;                  // "Hi there!"
-res.stop_reason;                      // "end_turn"
-res.stop_sequence;                    // null
+// Identical to the Anthropic Node SDK response shape
+res.content[0].text; // "Hi there!"
+res.stop_reason; // "end_turn"
 res.usage.input_tokens;
 res.usage.output_tokens;
-res.usage.cache_creation_input_tokens;
 res.usage.cache_read_input_tokens;
 ```
 
-### Anthropic streaming
+### Streaming
 
 ```typescript
 for await (const chunk of gw.stream("anthropic", "claude-opus-4-6", messages)) {
-  // Same shape as Anthropic streaming SDK
   if (chunk.type === "content_block_delta") {
     process.stdout.write(chunk.delta.text);
   }
@@ -125,41 +152,34 @@ for await (const chunk of gw.stream("anthropic", "claude-opus-4-6", messages)) {
 }
 ```
 
-### Anthropic models
+### Available models
 
 ```typescript
 gw.models("anthropic");
 // ["claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6",
-//  "claude-haiku-4-5", "claude-haiku-4-5-20251001", "claude-opus-4-5",
-//  "claude-sonnet-4-5", "claude-sonnet-4-5-20250929"]
+//  "claude-haiku-4-5", "claude-haiku-4-5-20251001"]
 ```
 
 ---
 
 ## Gemini
 
-Response fields match the [Google Generative AI Node SDK](https://github.com/google-gemini/generative-ai-js) exactly.
-
 ```typescript
 const res = await gw.chat("gemini", "gemini-2.5-pro", [
   { role: "user", content: "Hello" },
 ]);
 
-// Same fields as Gemini SDK
-res.candidates[0].content.parts[0].text;   // "Hi there!"
-res.candidates[0].content.role;             // "model"
-res.candidates[0].finishReason;             // "STOP"
+// Identical to the Google Generative AI Node SDK response shape
+res.candidates[0].content.parts[0].text; // "Hi there!"
+res.candidates[0].finishReason; // "STOP"
 res.usageMetadata.promptTokenCount;
-res.usageMetadata.candidatesTokenCount;
 res.usageMetadata.totalTokenCount;
-res.modelVersion;
 ```
 
-### Gemini streaming
+### Streaming
 
 ```typescript
 for await (const chunk of gw.stream("gemini", "gemini-2.5-pro", messages)) {
-  // Same shape as Gemini streaming SDK
   process.stdout.write(chunk.candidates[0].content.parts[0].text);
 
   if (chunk.usageMetadata) {
@@ -168,7 +188,7 @@ for await (const chunk of gw.stream("gemini", "gemini-2.5-pro", messages)) {
 }
 ```
 
-### Gemini models
+### Available models
 
 ```typescript
 gw.models("gemini");
@@ -178,9 +198,9 @@ gw.models("gemini");
 
 ---
 
-## Per-request provider key (BYOK per user)
+## Per-request provider keys (BYOK)
 
-If your users supply their own provider keys:
+If your users supply their own provider keys (Bring Your Own Key), pass it per-request:
 
 ```typescript
 const gw = new Gateway({ apiKey: "gw_live_abc123" });
@@ -194,13 +214,13 @@ await gw.chat("openai", "gpt-4o", messages, {
 
 ## Next.js — Route Handler (App Router)
 
-**Never import `Gateway` in a Client Component.** Always use from a Route Handler or Server Action.
+> **Important:** Never use `Gateway` in a Client Component. Always call it from a Route Handler or Server Action.
 
-### Raw chunks
+### Streaming raw chunks
 
 ```typescript
 // app/api/chat/route.ts
-import { Gateway } from "llmgateway";
+import { Gateway } from "@piyushhsainii/llmgateway";
 import { NextRequest } from "next/server";
 
 const gw = new Gateway();
@@ -212,23 +232,32 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       for await (const chunk of gw.stream(provider, model, messages)) {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`),
+        );
       }
       controller.close();
     },
   });
 
   return new Response(stream, {
-    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+    },
   });
 }
 ```
 
-### Vercel AI SDK compatible (`useChat` hook)
+### Vercel AI SDK compatible (`useChat`)
 
 ```typescript
 // app/api/chat/route.ts
-import { Gateway, toVercelChunk, formatVercelSSELine } from "llmgateway";
+import {
+  Gateway,
+  toVercelChunk,
+  formatVercelSSELine,
+} from "@piyushhsainii/llmgateway";
 import { NextRequest } from "next/server";
 
 const gw = new Gateway();
@@ -240,14 +269,19 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       for await (const chunk of gw.stream("openai", "gpt-4o", messages)) {
-        controller.enqueue(encoder.encode(formatVercelSSELine(toVercelChunk(chunk))));
+        controller.enqueue(
+          encoder.encode(formatVercelSSELine(toVercelChunk(chunk))),
+        );
       }
       controller.close();
     },
   });
 
   return new Response(stream, {
-    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+    },
   });
 }
 ```
@@ -284,34 +318,33 @@ import {
   GatewayUpstreamError,
   GatewayConfigError,
   GatewayTimeoutError,
-} from "llmgateway";
+} from "@piyushhsainii/llmgateway";
 
 try {
   const res = await gw.chat("openai", "gpt-4o", messages);
 } catch (err) {
   if (err instanceof GatewayAuthError) {
-    // 401 — invalid or missing gateway key
+    // 401 — invalid or missing gateway API key
   } else if (err instanceof GatewayRateLimitError) {
-    // 429 — err.retryAfter is seconds to wait
-    await new Promise(r => setTimeout(r, err.retryAfter * 1000));
+    // 429 — rate limited; err.retryAfter is seconds to wait
+    await new Promise((r) => setTimeout(r, err.retryAfter * 1000));
   } else if (err instanceof GatewayBudgetError) {
-    // 402 — err.spent and err.limit in USD
-    console.log(`Spent $${err.spent} of $${err.limit}`);
+    // 402 — budget exceeded; err.spent and err.limit are in USD
+    console.log(`Spent $${err.spent} of $${err.limit} budget`);
   } else if (err instanceof GatewayUpstreamError) {
-    // 502/503 — err.provider is which provider failed
+    // 502/503 — provider failed; err.provider tells you which one
+    console.log(`${err.provider} is currently unavailable`);
   } else if (err instanceof GatewayConfigError) {
-    // missing apiKey or providerKey
+    // Missing apiKey or providerKey in config
   } else if (err instanceof GatewayTimeoutError) {
-    // request exceeded timeout
+    // Request exceeded the configured timeout
   }
 }
 ```
 
 ---
 
-## Deploying the gateway (Shuttle.rs)
-
-### First deploy
+## Self-hosting with Shuttle.rs
 
 ```bash
 # Install Shuttle CLI
@@ -320,10 +353,10 @@ cargo install cargo-shuttle
 # Login
 cargo shuttle login
 
-# Inside your llm-gateway Rust repo
+# Inside the llm-gateway Rust repo
 cargo shuttle init --name llm-gateway
 
-# Set secrets
+# Set your secrets
 cargo shuttle secrets set DATABASE_URL postgresql://...
 cargo shuttle secrets set ADMIN_KEY your_admin_key_here
 cargo shuttle secrets set GATEWAY_ENCRYPTION_KEY your_32_byte_base64_key
@@ -338,40 +371,13 @@ Your gateway URL will be `https://llm-gateway.shuttleapp.rs`. Set it as:
 LLMGATEWAY_BASE_URL=https://llm-gateway.shuttleapp.rs/v1
 ```
 
-### Redeploy after changes
-
-```bash
-cargo shuttle deploy
-```
-
-### Logs
-
-```bash
-cargo shuttle logs --follow
-```
+Subsequent deploys: `cargo shuttle deploy`  
+View logs: `cargo shuttle logs --follow`
 
 ---
 
-## Publishing to npm
+## Links
 
-```bash
-npm run build
-npm pack --dry-run    # verify what gets published
-npm publish --access public
-```
-
-Scoped package:
-
-```bash
-# change "name" in package.json to "@your-org/llmgateway"
-npm publish --access public
-```
-
----
-
-## Running tests
-
-```bash
-npm install
-npm test
-```
+- Dashboard & sign up: [lllm-gateway.vercel.app](https://lllm-gateway.vercel.app/)
+- Gateway server (open source): [github.com/piyushhsainii/lllm-gateway](https://github.com/piyushhsainii/lllm-gateway)
+- npm: [@piyushhsainii/llmgateway](https://www.npmjs.com/package/@piyushhsainii/llmgateway)

@@ -5,8 +5,7 @@ export default function Nav() {
   return (
     <nav className={styles.nav}>
       <div className={styles.logo}>
-        <span className={styles.dot} />
-        llm-gateway
+        <img src="/llmgateway-logo-nobg.png" className='h-20 ' alt="" />
       </div>
       <div className={styles.links}>
         <Link href="#how">How it works</Link>
